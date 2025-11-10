@@ -84,7 +84,7 @@ panel_dataset <- function(){
   
   periods <- 10
   
-  effect_size = 0.3
+  effect_size <- 0.3
   
   # INITIALIZING VECTORS
   
@@ -137,11 +137,90 @@ panel_dataset <- function(){
   
   df$y <- df$d   * df$b + df$unit_fe + df$time_fe + df$e
   
-  cat("This data frame has the following columns:\n  * `d` for treatment status for the observation\n  * `g` for period first-treated\n  * `y` for outcome\n  * `unit_fe` for unit fixed effects\n  * `time_fe` for time fixed effects\n  * `i` for unit index\n  * `t` for time index")
-  return(df[ , c("i", "t", "d", "g", "y", "unit_fe", "time_fe")])
+  cat("This data frame has the following columns:\n  * `d` for treatment status for the observation\n  * `g` for period first-treated\n  * `y` for outcome\n  * `i` for unit index\n  * `t` for time index")
+  return(df[ , c("i", "t", "d", "g", "y")])
   
 }
 
+
+panel_dataset_HTEs <- function(){
+
+  periods <- 10
+  
+  effect_size <- 0.3
+  
+  # INITIALIZING VECTORS
+  
+  i <- 1:50
+  t <- 1:periods
+  
+  # UNIT/TIME FACTORS 
+  
+  # Year fixed effects are a simulated random walk. 
+  time <- data.frame(
+    t = 1:periods,
+    time_fe = random_walk_simulated(n = periods)
+  )
+  
+  # Unit fixed effects are literally just index values 1:50. This is
+  # quite arbitrary.
+  unit <- data.frame(
+    i = 1:50,
+    unit_fe = 1:50 * 0.1 
+  )
+  
+  # TREATMENT ASSIGNMENT 
+  
+  # The unit fixed effects increase with the index of the unit;
+  # this line of code assigns the units with the 25 largest fixed effects to
+  # treatment, then assigns g in a way that is correlated with the fixed effects
+  g <- assign_g_cor_i_FEs(periods = periods)
+  
+  # This line of code sets up that units treated sooner have lower treatment 
+  # effects 
+  g <- sort(g)
+  
+  # MODELING THE TREATMENT EFFECTS
+  # Tau here is monotonically increasing in g, but scaled so that the raw 
+  # average treatment effect is the effect size of interest.
+  tau <- ifelse(g > 0, i - 25, 0) * (effect_size / mean({i - 25}[g > 0])) 
+  
+  # Manipulating the treatment effects associated with some high-leverage points 
+  tau[26:30] <- tau[26:30] - 10 * effect_size
+  
+  tau[50] <- tau[50] + 5 * 10 * effect_size
+  
+  
+  # PUTTING TOGETHER THE DATA FRAME
+  df <- merge(data.frame(i = i, g = g, tau = tau), data.frame(t = t), by = NULL)
+  
+  # IDENTIFYING IN-TREATMENT UNITS
+  
+  df$d <- ifelse(test = (df$g != 0 & df$t >= df$g), yes = 1, no = 0)
+  
+  # ADDING IN THE FACTORS 
+  
+  df <- merge(df, unit, by = "i")
+  df <- merge(df, time, by = "t")
+  
+  # ADDING IN RAW AVERAGE TAU
+  df$mean_tau_raw <- mean(tau[g > 0])
+  
+  # ADDING IN TIME-WEIGHTED AVERAGE TAU
+  df$mean_tau_t_weighted <- mean(df$tau[df$d])
+  
+  # OUTCOMES 
+  
+  df$e <- rnorm(nrow(df))
+  
+  df$y <- df$d * df$tau + df$unit_fe + df$time_fe + df$e
+  
+  df$b <- effect_size
+
+  cat("This data frame has the following columns:\n  * `d` for treatment status for the observation\n  * `g` for period first-treated\n  * `y` for outcome\n  * `i` for unit index\n  * `t` for time index")
+  return(df[ , c("i", "t", "d", "g", "y")])
+  
+}
 
 rd_dataset <- function(){
   
