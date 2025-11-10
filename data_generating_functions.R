@@ -153,7 +153,7 @@ rd_dataset <- function(){
   
   cutoff_side <- c(rep("pre", 500), rep("post", 500))
   
-  cat("This data frame has the following columns:\n  * `Y` for the outcome\n  * `X` for the running variable\n  * `c` for the cutoff - just one constant, but stored in a column for convenience")\n  * `cutoff_side` for whether an observation is pre- or post-cutoff
+  cat("This data frame has the following columns:\n  * `Y` for the outcome\n  * `X` for the running variable\n  * `c` for the cutoff - just one constant, but stored in a column for convenience")\n  * `cutoff_side` for whether an observation is pre- or post-cutoff")
   return(data.frame(Y = Y,
                     X = 1:1000,
                     c = 501,
