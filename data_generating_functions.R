@@ -156,10 +156,10 @@ panel_dataset_HTEs <- function(){
   
   # UNIT/TIME FACTORS 
   
-  # Year fixed effects are a simulated random walk. 
+  # Year fixed effects are normally distributed. 
   time <- data.frame(
     t = 1:periods,
-    time_fe = random_walk_simulated(n = periods)
+    time_fe = rnorm(periods)
   )
   
   # Unit fixed effects are literally just index values 1:50. This is
