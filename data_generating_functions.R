@@ -151,9 +151,11 @@ rd_dataset <- function(){
   
   Y <- jitter(Y, amount = 0.1)
   
+  cutoff_side <- c(rep("pre", 500), rep("post", 500))
   
   cat("This data frame has the following columns:\n  * `Y` for the outcome\n  * `X` for the running variable\n  * `c` for the cutoff - just one constant, but stored in a column for convenience")
   return(data.frame(Y = Y,
                     X = 1:1000,
-                    c = 501))
+                    c = 501,
+                    cutoff_side = cutoff_side))
 }
