@@ -1,3 +1,36 @@
+
+assign_g_cor_i_FEs <- function(periods, n_treated = 25){
+  
+  if (periods == 2){
+    return(c(rep(0,  50 - n_treated), rep(2, n_treated)))
+  }else{
+    g <- 2:periods
+    
+    # The goal of this initial process is to create evenly sized cohorts 
+    # among the 25 treated units. First, the code creates as many evenly sized
+    # groups as it can using 25 units and all available g's. Then, for any 
+    # remainder (25 cannot be divided evenly among all available G sizes that
+    # we could imagine), it takes a random sample of g's equivalent to the size
+    # of the remainder. 
+    size_of_group <- floor(n_treated/length(g))
+    g_assignment_vector <- c(rep(g, size_of_group), # creating most of the 
+                             # vector of g's, with every 
+                             # available g getting 
+                             # repeated an even number of 
+                             # times
+                             sample(g, n_treated %% length(g))) # getting a random 
+    # sample of g's to 
+    # fill out any 
+    # remaining g slots
+    
+    # Then, the code sorts the g's so that units with larger fixed effects get
+    # treated progressively later.
+    return(sort(c(rep(0, 50 - n_treated), g_assignment_vector)))
+  }
+}
+
+
+
 experimental_dataset <- function(N = 10000){
   
   N1 <- floor(0.5   * N)
