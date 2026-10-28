@@ -11,14 +11,14 @@ library(ggrepel)
 # Figure 1: George Floyd Media Coverage, Social Media Posts, and Search Behavior ---
 ########
 
-media <- read_csv('~/Dropbox/Cornell classes/Analysis of Natural Experiments - fall 2026/coding modules/rdd/reny_newman_replication_data/floyd_mediacloud.csv')
+media <- read_csv('floyd_mediacloud.csv')
 media <- media %>%
   rename('newspapers'='floyd',
          'day'='date') %>%
   mutate(day = lubridate::mdy(day)) %>%
   mutate(newspapers = (newspapers-min(newspapers))/(max(newspapers)-min(newspapers)))
 
-twitter <- read_csv('~/Dropbox/Cornell classes/Analysis of Natural Experiments - fall 2026/coding modules/rdd/reny_newman_replication_data/floyd_twitter.csv')
+twitter <- read_csv('floyd_twitter.csv')
 twitter <- twitter %>%
   mutate(day = mdy(date)) %>%
   rename('twitter'='posts') %>%
@@ -53,7 +53,9 @@ p1 <- left_join(media, twitter, by='day') %>%
   annotate('text', x=ymd('2020-05-26'), y=0.95,label='International\nProtests\nBegin\nMay 28', size=3) 
   ggsave(width=10,height=5, 'replication_figures_new/figure_1a.tiff')
 
-path <- '~/Dropbox/Cornell classes/Analysis of Natural Experiments - fall 2026/coding modules/rdd/reny_newman_replication_data'
+# Insert the name of the working directory that you created above, where you are storing this file
+path <- '' 
+
 files <- list.files(path,full.names = T)
 files <- files[grep('gtrends',files)]
 terms <- c('Black Lives\nMatter','George Floyd','Police\nViolence',
@@ -82,7 +84,7 @@ ggsave(grobz, width=10, height=10,
        filename = 'replication_figures_new/figure_1_full.tiff')
 
 ### Nationscape Data
-df <- read_dta('~/Dropbox/Cornell classes/Analysis of Natural Experiments - fall 2026/coding modules/rdd/reny_newman_replication_data/nationscape_clean_replication.dta')
+df <- read_dta('nationscape_clean_replication.dta')
 
 # recode vars of interest
 blacks <- df %>% filter(race_ethnicity == 2 & hispanic == 1)
@@ -365,7 +367,7 @@ results2 <- apply(bind_rows(t1, t2, t3, t4), 2, unlist)
 results2 <- as.data.frame(results2)
 
 results2 %>%
-  write_csv('~/Dropbox/Cornell classes/Analysis of Natural Experiments - fall 2026/coding modules/rdd/reny_newman_replication_data/replication_figures_new/tableb3.csv')
+  write_csv('~/replication_figures_new/tableb3.csv')
 
 
 
@@ -1223,7 +1225,7 @@ bind_rows(
 
 full_plot <- rdplot(df$group_favorability_the_police,df$day_running,
                     p=1, kernel = 'uniform')
-shootings <- read_csv('~/Dropbox/Cornell classes/Analysis of Natural Experiments - fall 2026/coding modules/rdd/reny_newman_replication_data/other_shootings_washpo.csv')
+shootings <- read_csv('other_shootings_washpo.csv')
 shootings$day <- ymd(shootings$date)
 shootings <- shootings %>% filter(day >= ymd('2019-07-18'))
 shootings <- shootings %>%
